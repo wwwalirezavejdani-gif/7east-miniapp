@@ -1,1 +1,49 @@
-
+<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>7East test</title>
+<style>
+body{font-family:Tahoma,system-ui,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:14px;line-height:1.7;font-size:15px}
+h1{font-size:1.15rem;margin:0 0 4px}.sub{color:#94a3b8;font-size:.85rem;margin-bottom:12px}
+button{width:100%;margin:6px 0;padding:13px;border:0;border-radius:12px;background:#0ea5e9;color:#fff;font-size:1rem;font-weight:700;font-family:inherit}
+button.g{background:#334155}
+pre{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:10px;white-space:pre-wrap;word-break:break-all;direction:ltr;text-align:left;font-size:.78rem;max-height:46vh;overflow:auto}
+</style>
+</head><body>
+<h1>🧪 آزمایش مینی‌اپ ۷ایست</h1><div class="sub">این صفحه فقط می‌سنجد بله چه چیزهایی را پشتیبانی می‌کند. نتیجه را برای من بفرستید (اسکرین‌شات از کادر پایین).</div>
+<button id="b1">۱) ارسال داده به ربات (sendData)</button>
+<button id="b2" class="g">۲) نمایش هشدار (showAlert)</button>
+<button id="b3" class="g">۳) بسته شدن (close)</button>
+<button id="b4" class="g">۴) باز کردن لینک بیرونی</button>
+<pre id="log">...</pre>
+<script>
+const L=[];function log(s){L.push(s);var e=document.getElementById('log');if(e)e.textContent=L.join('\n')}
+function keys(o){try{return Object.keys(o).join(', ')}catch(e){return '?'}}
+window.addEventListener('error',function(e){log('JS error: '+e.message)});
+log('1) صفحه بارگذاری شد و جاوااسکریپت کار می‌کند ✔');
+log('UA: '+navigator.userAgent);
+log('url: '+location.href);
+var W=null;
+function detect(){
+  ['Bale','BaleWebApp','Telegram','TelegramWebviewProxy','WebApp','miniapp','MiniApp','bale'].forEach(function(n){if(window[n]!==undefined)log('window.'+n+' = {'+keys(window[n])+'}')});
+  W=(window.Bale&&window.Bale.WebApp)||(window.Telegram&&window.Telegram.WebApp)||window.WebApp||window.BaleWebApp||null;
+  log('WebApp object: '+(W?'FOUND {'+keys(W)+'}':'NOT FOUND'));
+  if(W){
+    try{log('version='+W.version+' platform='+W.platform)}catch(e){}
+    try{log('initData='+String(W.initData).slice(0,300))}catch(e){}
+    try{log('initDataUnsafe='+JSON.stringify(W.initDataUnsafe).slice(0,400))}catch(e){}
+    try{W.ready&&W.ready();W.expand&&W.expand();log('ready/expand called')}catch(e){log('ready err '+e)}
+  }
+}
+log('2) در حال بارگذاری کتابخانهٔ بله...');
+var sc=document.createElement('script');
+sc.src='https://tapi.bale.ai/miniapp.js?3';
+sc.onload=function(){log('3) miniapp.js بارگذاری شد ✔');detect()};
+sc.onerror=function(){log('3) miniapp.js بارگذاری نشد ✘ (اینترنت یا فیلتر)');detect()};
+document.head.appendChild(sc);
+setTimeout(function(){if(!W)log('4) (۶ ثانیه گذشت) هنوز WebApp پیدا نشد');},6000);
+function need(f){return function(){try{f()}catch(e){log('خطا: '+e)}}}
+document.getElementById('b1').onclick=need(function(){if(!W||!W.sendData){log('sendData: NOT AVAILABLE');return}W.sendData(JSON.stringify({t:'test',n:1}));log('sendData called')});
+document.getElementById('b2').onclick=need(function(){if(W&&W.showAlert)W.showAlert('سلام از ۷ایست');else alert('سلام (alert ساده)');log('alert shown')});
+document.getElementById('b3').onclick=need(function(){if(W&&W.close)W.close();else log('close: NOT AVAILABLE')});
+document.getElementById('b4').onclick=need(function(){if(W&&W.openLink)W.openLink('https://example.com');else window.open('https://example.com');log('open called')});
+</script></body></html>
